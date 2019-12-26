@@ -35,7 +35,7 @@ export default {
     };
   },
   created() {},
-  async mounted() {
+  mounted() {
     var _this = this;
     _this.$get("v2/index_entry").then(response => {
       let ResLength = response.length;
@@ -47,20 +47,17 @@ export default {
       _this.navData = TypeArray;
       // console.log("111", _this.navData);
       _this.$nextTick(function() {
-        _this.swiper_init();
+        var swiper = new Swiper(".swiper-container", {
+          pagination: {
+            el: ".swiper-pagination"
+          },
+          loop: true
+        });
       });
     });
   },
   updated() {},
   methods: {
-    swiper_init() {
-      var swiper = new Swiper(".swiper-container", {
-        pagination: {
-          el: ".swiper-pagination"
-        },
-        loop: true
-      });
-    },
     /**
      * 通过解码获取食物分类中每类对应的id,用于数据请求；
      * url --> 每类食物对应的url

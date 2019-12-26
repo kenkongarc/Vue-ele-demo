@@ -11,11 +11,11 @@
         :to="{path:'/shipping_address'}"
         class="home-address"
         v-show="addressFlag"
-        @click.native="search_map_position(selectPosition)"
+        @click.native="search_map_position(Object.keys(selectPosition).length > 0 ? selectPosition : currentPosition)"
       >
         <div class="address-icon">
           <i class="fa fa-map-marker"></i>
-          <span>{{selectPosition.name || currentPosition}}</span>
+          <span>{{selectPosition.name || selectPosition.title || currentPosition.currentPosName}}</span>
           <!-- <div id="box" style="width:0;height:0;display:none"></div> -->
           <i class="fa fa-angle-down"></i>
         </div>
@@ -63,19 +63,8 @@ export default {
     init_data() {
       window.addEventListener("scroll", this.debounce(this.show_scrollTop, 50));
       this.$store.dispatch("add_map_position");
-      // this.first_get_cur_position();
       this.get_cityId();
     },
-    // first_get_cur_position() {
-    //   // console.log("first", this.$route.query);
-    //   var hasQuery = this.$route.query;
-    //   if (Object.keys(hasQuery).length === 0) {
-    //     console.log("first", hasQuery);
-    //     this.$store.dispatch("add_map_position");
-    //   } else {
-    //     return false;
-    //   }
-    // },
     debounce(fn, delaytime) {
       let timer = null;
       return function() {
@@ -97,7 +86,6 @@ export default {
       this.$get("/v1/cities?type=guess").then(res => {
         let _this = this;
         localStorage.cityId = res.id;
-        // console.log("222", res);
       });
     }
   }

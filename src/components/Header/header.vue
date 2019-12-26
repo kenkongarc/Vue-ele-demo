@@ -10,7 +10,13 @@
 export default {
   props: ["headerTitle"],
   data() {
-    return {};
+    return {
+      straightRoute: [
+        { title: "选择收货地址", path: "/home" },
+        { title: "搜索地址", path: "/shipping_address" }
+        // { title: "搜索地址", path: "/shipping_address" }
+      ]
+    };
   },
 
   components: {},
@@ -21,7 +27,16 @@ export default {
 
   methods: {
     goback() {
-      this.$router.go(-1);
+      var oriArr = this.straightRoute;
+      var or = oriArr.filter((item, index, oriArr) => {
+        return item.title == this.headerTitle;
+      });
+      var len = or.length;
+      if (len > 0) {
+        this.$router.push(or[0]["path"]);
+      } else {
+        this.$router.go(-1);
+      }
     }
   }
 };

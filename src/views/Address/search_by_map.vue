@@ -8,9 +8,10 @@
       <ul>
         <router-link
           tag="li"
-          :to="{path:'/add_ship_address',query:{address:item}}"
+          :to="{ path:to,query:{position:item}}"
           v-for="(item,index) in surrounding"
           :key="index"
+          @click.native="set_history(item,addAddressFlag)"
         >
           <i class="iconfont icon-ic_tomap"></i>
           <div>
@@ -27,9 +28,11 @@
 import { mapState, mapMutations, mapActions } from "vuex";
 import BMap from "BMap";
 export default {
+  props: ["addAddressFlag"],
   data() {
     return {
-      surrounding: null
+      surrounding: null,
+      to: "/add_ship_address"
     };
   },
 
@@ -46,13 +49,27 @@ export default {
   created() {},
   mounted() {
     this.init_map();
+    this.init_data();
   },
 
   methods: {
-    init_data() {},
+    init_data() {
+      console.log("QUERY", this.addAddressFlag);
+      if (!this.addAddressFlag) {
+        this.to = "/home";
+      }
+    },
     init_map() {
+      var longitude =
+        Object.keys(this.selectPosition).length > 0
+          ? this.selectPosition.longitude || this.selectPosition.point["lng"]
+          : this.currentPosition.longitude;
+      var latitude =
+        Object.keys(this.selectPosition).length > 0
+          ? this.selectPosition.latitude || this.selectPosition.point.lat
+          : this.currentPosition.latitude;
       var map = new BMap.Map("map");
-      var point = new BMap.Point(120.448106, 36.315803);
+      var point = new BMap.Point(longitude, latitude);
       map.centerAndZoom(point, 16);
       map.enableScrollWheelZoom(true);
 
@@ -62,25 +79,31 @@ export default {
       marker.disableMassClear(); //禁止清除
 
       var geoc = new BMap.Geocoder();
+      this.get_position(marker, geoc);
 
       marker.addEventListener("dragend", () => {
-        var p = marker.getPosition(); //获取marker的位置
-        console.log("marker的位置是" + p.lng + "," + p.lat);
-
-        geoc.getLocation(p, res => {
-          console.log("res", res);
-          this.surrounding = res.surroundingPois;
-          var label = new BMap.Label(res["surroundingPois"][0].title, {
-            offset: new BMap.Size(-30, -25)
-          });
-          label.enableMassClear();
-          marker.setLabel(label);
-        });
+        this.get_position(marker, geoc);
       });
 
       marker.addEventListener("dragging", () => {
         map.clearOverlays();
       });
+    },
+    get_position(marker, geoc) {
+      var p = marker.getPosition(); //获取marker的位置
+
+      geoc.getLocation(p, res => {
+        this.surrounding = res.surroundingPois;
+        var label = new BMap.Label(res["surroundingPois"][0].title, {
+          offset: new BMap.Size(-30, -25)
+        });
+        label.enableMassClear();
+        marker.setLabel(label);
+      });
+    },
+    set_history(item, b) {
+      console.log("map", b);
+      this.$parent.set_history(item, b);
     }
   }
 };

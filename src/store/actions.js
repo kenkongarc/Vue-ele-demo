@@ -36,10 +36,9 @@ export default {
   },
   //根据搜索位置获取定位
   search_map_position(store, item) {
-    if (!item["longitude"]) return false;
+    if (!(item["longitude"] || item["point"]["lng"])) return false;
     let geocoder = new BMap.Geocoder();
-    let geo = new BMap.Point(item.longitude, item.latitude)
-    // let geo = new BMap.Point(120.385155, 36.105408)
+    let geo = new BMap.Point(item.longitude || item.point.lng, item.latitude || item.point.lat)
     geocoder.getLocation(
       geo,
       res => {

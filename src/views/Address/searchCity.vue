@@ -37,7 +37,7 @@
               v-for="(item,index) in historyList"
               :key="index"
               @click.native="set_city_by_history(item)"
-            >{{item.name}}</router-link>
+            >{{item.name || item.title}}</router-link>
           </ul>
           <div class="clear-history">
             <div @click="clear_history">清空搜索历史</div>
@@ -47,8 +47,8 @@
           <ul class="result-list" v-show="hasResult">
             <router-link
               tag="li"
-              :to="{path:'/home',query:{position:item}}"
-              @click.native="set_history(item)"
+              :to="{path:to,query:{position:item}}"
+              @click.native="set_history(item, add_address_flag)"
               v-for="(item,index) in searchResult"
               :key="index"
             >
@@ -63,7 +63,7 @@
           </div>
         </div>
       </div>
-      <SearchByMap v-else></SearchByMap>
+      <SearchByMap :add-address-flag="add_address_flag" v-else></SearchByMap>
     </main>
   </div>
 </template>
@@ -79,6 +79,7 @@ export default {
       currentCity: "",
       cityId: "",
       keyword: "",
+      to: "/add_ship_address",
       searchResult: [],
       historyList: [],
       hasHistory: false,
@@ -92,7 +93,17 @@ export default {
     SearchByMap
   },
 
-  computed: { ...mapState(["searchHistory"]) },
+  computed: {
+    ...mapState(["searchHistory"]),
+    add_address_flag() {
+      if (
+        Object.keys(this.$route.query).length > 0 &&
+        this.$route.query.search_type
+      ) {
+        return true;
+      }
+    }
+  },
 
   mounted() {
     this.init_data();
@@ -106,6 +117,10 @@ export default {
     init_data() {
       let _this = this;
       let oas = _this.searchHistory;
+      if (!_this.add_address_flag) {
+        _this.to = "/home";
+      }
+      console.log("8888", _this.add_address_flag);
       // let oas = JSON.parse(localStorage.searchHistory);
       _this.headerTitle = this.$route.meta.title;
       _this.cityId = this.$route.params.currentCityId;
@@ -122,23 +137,28 @@ export default {
         this.searchResult = res;
       });
     },
-    set_history(item) {
-      item.id = this.cityId;
-      item.city = this.currentCity;
-      let oas = JSON.parse(localStorage.getItem("searchHistory"));
-      if (oas.length < 1) {
-        oas.push(item);
-        localStorage.setItem("searchHistory", JSON.stringify(oas));
+    set_history(item, b) {
+      console.log("yyy", b);
+      if (b) {
+        return false;
       } else {
-        let oa = oas.some(function(aaa, index, oas) {
-          return aaa.name === item.name;
-        });
-        if (!oa) {
+        item.id = this.cityId;
+        item.city = this.currentCity;
+        let oas = JSON.parse(localStorage.getItem("searchHistory"));
+        if (oas.length < 1) {
           oas.push(item);
+          localStorage.setItem("searchHistory", JSON.stringify(oas));
+        } else {
+          let oa = oas.some(function(aaa, index, oas) {
+            return (aaa.name || aaa.title) === (item.name || item.title);
+          });
+          if (!oa) {
+            oas.push(item);
+          }
+          localStorage.setItem("searchHistory", JSON.stringify(oas));
         }
-        localStorage.setItem("searchHistory", JSON.stringify(oas));
+        localStorage.setItem("selectPosition", JSON.stringify(item));
       }
-      localStorage.setItem("selectPosition", JSON.stringify(item));
     },
     clear_history() {
       localStorage.searchHistory = JSON.stringify([]);

@@ -105,7 +105,7 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-primary" @click.native="set_male">保存并使用</button>
+        <button class="btn btn-primary">保存并使用</button>
       </div>
     </main>
   </div>
@@ -139,7 +139,7 @@ export default {
       "currentCityId"
     ])
   },
-
+  created() {},
   mounted() {
     this.init_data();
   },
@@ -147,8 +147,12 @@ export default {
   methods: {
     init_data() {
       let _this = this;
+      let query = _this.$route.query;
       _this.headerTitle = _this.$route.meta.title;
-      _this.address = _this.$route.query.address.title;
+      _this.address =
+        Object.keys(query).length > 0
+          ? query.position.title || query.position.name
+          : "选择收货地址";
     }
   }
 };

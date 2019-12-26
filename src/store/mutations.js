@@ -8,10 +8,12 @@ import {
 } from "./const";
 export default {
   [GET_CURRENT_POSITION](state, res) {
-    state.currentPosition = res.addressComponents.street + res.addressComponents.streetNumber
-    state.currentCity = res.addressComponents.city
+    state.currentPosition.currentPosName = res.addressComponents.street + res.addressComponents.streetNumber
+    state.currentPosition.currentCity = res.addressComponents.city
     state.surroundingPosition = res.surroundingPois
-    state.currentCityId = localStorage.cityId
+    state.currentPosition.longitude = res.point.lng
+    state.currentPosition.latitude = res.point.lat
+    state.currentPosition.currentCityId = localStorage.cityId
     state.selectPosition = JSON.parse(localStorage.selectPosition)
     state.searchHistory = JSON.parse(localStorage.searchHistory)
   },
@@ -20,10 +22,7 @@ export default {
     state.selectCityId = item.id
   },
   [SET_SELECT_CITY](state, item) {
-    state.selectCity = item.city || item.name
-    state.selectCityId = item.id
-    state.selectPosition = item.name
-    // localStorage.selectPosition = item
+    state.selectPosition = item
   },
   [SET_LOGIN_STATE](state, item) {
     state.isLogin = item

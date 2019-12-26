@@ -21,9 +21,10 @@
             <li v-show="this.filterResult && this.filterResult.length < 1" class="no-result">无结果</li>
             <router-link
               tag="li"
-              :to="{path:'/shipping_address',query:{city:item.name,cityId:item.id}}"
+              :to="{path:'/shipping_address',query:item}"
               v-for="(item,index) in filterResult"
               :key="index"
+              @click.native="set_select_city(item)"
               class="content-item"
             >{{item.name}}</router-link>
           </ul>
@@ -44,9 +45,10 @@
             <div class="type-title">当前定位城市</div>
             <router-link
               tag="div"
-              :to="{path:'/shipping_address',query:{city:currentCity,cityId:cityId}}"
+              :to="{path:'/shipping_address',query:{currentCity}}"
+              @click.native="set_select_city(currentCity)"
               class="cur-city"
-            >{{currentCity}}</router-link>
+            >{{currentCity.name}}</router-link>
           </div>
           <div class="all-city">
             <div class="fist-index-city" v-for="(value,key,index) in sortCityByIndex" :key="index">
@@ -54,7 +56,7 @@
               <ul class="padding-left">
                 <router-link
                   tag="li"
-                  :to="{path:'/shipping_address',query:{city:item.name,cityId:item.id}}"
+                  :to="{path:'/shipping_address',query:item}"
                   class="content-item"
                   v-for="(item,index) in value"
                   :key="index"
@@ -80,8 +82,7 @@ export default {
       defaultResult: [],
       hasCont: true,
       cityGroup: {},
-      currentCity: "",
-      cityId: ""
+      currentCity: {}
     };
   },
 
@@ -117,12 +118,10 @@ export default {
   created() {},
   mounted() {
     this.init_data();
-    // console.log("select", this.$store);
     this.$get("/v1/cities?type=group").then(res => {
       let _this = this;
       let new_obj = res;
       _this.cityGroup = new_obj;
-      // console.log("test", _this.cityGroup);
       let city_array = [];
       for (let key in new_obj) {
         city_array.push(new_obj[key]);
@@ -133,9 +132,7 @@ export default {
     });
     this.$get("/v1/cities?type=guess").then(res => {
       let _this = this;
-      _this.currentCity = res.name;
-      _this.cityId = res.id;
-      // console.log("222", res);
+      _this.currentCity = res;
     });
   },
 
@@ -150,7 +147,6 @@ export default {
     },
     search_city() {
       this.hasCont = this.value ? false : true;
-      // console.log("eee", this.value, this.filterResult);
     },
     goAnchor(sel) {
       let oa = this.$el.querySelector("#" + sel).offsetTop + 90;

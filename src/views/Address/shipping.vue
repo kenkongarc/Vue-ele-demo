@@ -9,11 +9,11 @@
             <span
               class="long-text"
               style="max-width:0.5rem;"
-            >{{city||selectPosition.city||currentCity}}</span>
+            >{{city||selectPosition.city||selectPosition.name||currentPosition.currentCity}}</span>
             <i class="fa fa-angle-down"></i>
           </router-link>
           <router-link
-            :to="'/search_city/'+ (cityId || selectPosition.id || currentCityId)"
+            :to="'/search_city/'+ (cityId || selectPosition.id || currentPosition.currentCityId)"
             class="search-add-detail"
           >
             <i class="fa fa-search"></i>
@@ -32,7 +32,7 @@
             <div class="posi-left">
               <i class="fa fa-paper-plane"></i>
               <!-- <span v-show="routeShow">{{currentPos}}</span> -->
-              <span>{{currentPosition}}</span>
+              <span>{{currentPosition.currentPosName}}</span>
             </div>
           </keep-alive>
           <div class="posi-right" @click="reget_cur_position">
@@ -71,7 +71,9 @@
       <div class="item-container surrounding">
         <div class="item-title">
           <span>附近地址</span>
-          <router-link :to="'/search_city/'+ (cityId || selectPosition.id || currentCityId)">
+          <router-link
+            :to="'/search_city/'+ (cityId || selectPosition.id || currentPosition.currentCityId)"
+          >
             <span>更多</span>
             <i class="fa fa-angle-right"></i>
           </router-link>
@@ -115,13 +117,7 @@ export default {
   },
 
   computed: {
-    ...mapState([
-      "currentPosition",
-      "selectPosition",
-      "currentCity",
-      "currentCityId",
-      "surroundingPosition"
-    ])
+    ...mapState(["currentPosition", "selectPosition", "surroundingPosition"])
   },
   created() {},
   mounted() {
@@ -135,8 +131,16 @@ export default {
     init_data() {
       let _this = this;
       _this.headerTitle = this.$route.meta.title;
-      _this.city = _this.$route.query ? _this.$route.query.city : "";
-      _this.cityId = _this.$route.query ? _this.$route.query.cityId : "";
+      _this.city =
+        Object.keys(_this.$route.query).length > 0 &&
+        _this.$route.query.currentCity
+          ? _this.$route.query.currentCity.name
+          : "";
+      _this.cityId =
+        Object.keys(_this.$route.query).length > 0 &&
+        _this.$route.query.currentCity
+          ? _this.$route.query.currentCity.id
+          : "";
       window.scrollTo(0, 0);
     },
     back_to_home() {
