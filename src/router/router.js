@@ -73,7 +73,8 @@ export default [{
       component: AddShipAddress,
       meta: {
         title: "新增地址",
-        auth: true
+        auth: true,
+        keepAlive: true
       }
     }, {
       path: '/modify_ship_address',
@@ -96,6 +97,7 @@ export default [{
       component: Register,
       meta: {
         title: "注册",
+        keepAlive: true
       }
     }
   ]

@@ -12,7 +12,6 @@ button {
   width: 100%;
   padding: 8px 0;
   border: 0;
-  background: #26a2ff;
   color: #fff;
 }
 
@@ -41,6 +40,12 @@ button {
   background-color: #d9edf7;
   border-color: #bce8f1;
   color: #31708f;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
 }
 
 .alert-danger {

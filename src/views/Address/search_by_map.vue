@@ -54,7 +54,7 @@ export default {
 
   methods: {
     init_data() {
-      console.log("QUERY", this.addAddressFlag);
+      // console.log("QUERY", this.addAddressFlag);
       if (!this.addAddressFlag) {
         this.to = "/home";
       }
@@ -102,7 +102,7 @@ export default {
       });
     },
     set_history(item, b) {
-      console.log("map", b);
+      // console.log("map", b);
       this.$parent.set_history(item, b);
     }
   }

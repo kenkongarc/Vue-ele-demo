@@ -43,7 +43,7 @@
         </div>
         <router-link
           tag="div"
-          :to="{path:'/search_city/'+ (selectPosition.id || currentCityId),query:{search_type:'map'}}"
+          :to="{path:'/search_city/'+ (selectPosition.id || currentPosition.currentCityId),query:{search_type:'map'}}"
           class="form-group"
         >
           <label for class="item-title">地址</label>
@@ -105,7 +105,7 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-primary">保存并使用</button>
+        <button class="btn btn-primary" @click="save_and_use">保存并使用</button>
       </div>
     </main>
   </div>
@@ -130,21 +130,37 @@ export default {
   components: {
     Headertitle
   },
-
+  beforeRouteLeave(to, from, next) {
+    if (to.path == "/shipping_address") {
+      this.username = "";
+      this.gender = "";
+      this.phone = "";
+      this.address = "选择收货地址";
+      this.detailAdd = "";
+      this.addressMark = "";
+    }
+    next();
+  },
   computed: {
-    ...mapState([
-      "currentPosition",
-      "selectPosition",
-      "currentCity",
-      "currentCityId"
-    ])
+    ...mapState(["currentPosition", "selectPosition"])
   },
   created() {},
   mounted() {
     this.init_data();
   },
-
+  activated() {
+    var query = this.$route.query;
+    if (
+      Object.keys(query).length > 0 &&
+      (this.address != query.position.title || query.position.name)
+    ) {
+      this.address = query.position.title || query.position.name;
+    } else {
+      this.address = "选择收货地址";
+    }
+  },
   methods: {
+    ...mapActions(["set_ship_address"]),
     init_data() {
       let _this = this;
       let query = _this.$route.query;
@@ -153,6 +169,36 @@ export default {
         Object.keys(query).length > 0
           ? query.position.title || query.position.name
           : "选择收货地址";
+    },
+    save_and_use() {
+      let query = this.$route.query;
+      let addId = new Date().getTime();
+      let add_detail = Object.keys(query).length > 0 ? query.position : {};
+      add_detail["id"] =
+        this.selectPosition.id || this.currentPosition.currentCityId;
+      add_detail["user_addId"] = addId;
+      add_detail["user_name"] = this.username;
+      add_detail["user_gender"] = this.gender;
+      add_detail["user_phoneNum"] = this.phone;
+      add_detail["user_detailAdd"] = this.detailAdd;
+      add_detail["user_addressMark"] = this.addressMark;
+      console.log("add", add_detail);
+      if (
+        this.username &&
+        this.phone &&
+        this.detailAdd &&
+        this.address &&
+        this.address !== "选择收货地址"
+      ) {
+        this.set_ship_address_tolacal(add_detail);
+        this.$router.push("/shipping_address");
+      }
+    },
+    set_ship_address_tolacal(item) {
+      let oas = JSON.parse(localStorage.getItem("shipAddress"));
+      oas.push(item);
+      localStorage.setItem("shipAddress", JSON.stringify(oas));
+      this.set_ship_address(item);
     }
   }
 };

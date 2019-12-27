@@ -4,6 +4,7 @@ import Mint from 'mint-ui';
 import router from './router';
 import store from './store/index';
 import VueCookies from 'vue-cookies';
+import VeeValidate from "vee-validate";
 
 import './style/main.scss'; //引入main.scss文件  all in js理念
 import './modules/rem';
@@ -13,7 +14,7 @@ import 'font-awesome/css/font-awesome.css';
 import 'vue-awesome/icons';
 import Icon from 'vue-awesome/components/Icon';
 
-import axios from 'axios';
+// import axios from 'axios';
 import {
   get,
   post
@@ -27,6 +28,7 @@ Vue.component('icon', Icon);
 
 Vue.use(Mint);
 Vue.use(VueCookies);
+Vue.use(VeeValidate);
 
 new Vue({
   router,

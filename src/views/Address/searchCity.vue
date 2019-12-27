@@ -15,7 +15,7 @@
               type="text"
               v-model="keyword"
               class="searchbar-core"
-              @keyup="debounce(get_city_detail(),50)"
+              @keyup="debounce(searchPosition_by_keyword(currentCity, keyword),50)"
               @focus="set_search_type_to_word"
             />
           </div>
@@ -48,11 +48,11 @@
             <router-link
               tag="li"
               :to="{path:to,query:{position:item}}"
-              @click.native="set_history(item, add_address_flag)"
               v-for="(item,index) in searchResult"
               :key="index"
+              @click.native="set_history(item, toFlag)"
             >
-              <p>{{item.name}}</p>
+              <p>{{item.title}}</p>
               <span>{{item.address}}</span>
             </router-link>
           </ul>
@@ -63,7 +63,7 @@
           </div>
         </div>
       </div>
-      <SearchByMap :add-address-flag="add_address_flag" v-else></SearchByMap>
+      <SearchByMap :add-address-flag="toFlag" v-else></SearchByMap>
     </main>
   </div>
 </template>
@@ -84,7 +84,8 @@ export default {
       historyList: [],
       hasHistory: false,
       hasResult: false,
-      searchType: true //true-> word; false->map
+      searchType: true, //true-> word; false->map
+      toFlag: false
     };
   },
 
@@ -94,23 +95,23 @@ export default {
   },
 
   computed: {
-    ...mapState(["searchHistory"]),
+    ...mapState(["searchHistory", "selectPosition", "currentPosition"]),
     add_address_flag() {
       if (
         Object.keys(this.$route.query).length > 0 &&
         this.$route.query.search_type
       ) {
-        return true;
+        return (this.toFlag = true);
       }
     }
   },
 
   mounted() {
     this.init_data();
-    this.$get("/v1/cities/" + this.cityId).then(res => {
-      this.currentCity = res.name;
-    });
-    this.get_city_detail();
+    // this.$get("/v1/cities/" + this.cityId).then(res => {
+    //   this.currentCity = res.name;
+    // });
+    // this.get_city_detail();
   },
   methods: {
     ...mapActions(["clear_search_history"]),
@@ -120,25 +121,37 @@ export default {
       if (!_this.add_address_flag) {
         _this.to = "/home";
       }
-      console.log("8888", _this.add_address_flag);
+      // console.log("8888", _this.add_address_flag);
       // let oas = JSON.parse(localStorage.searchHistory);
       _this.headerTitle = this.$route.meta.title;
       _this.cityId = this.$route.params.currentCityId;
+      _this.currentCity =
+        _this.selectPosition.city ||
+        _this.selectPosition.name ||
+        _this.currentPosition.currentCity;
       _this.historyList = oas;
       _this.hasHistory = oas.length > 0 ? true : false;
       _this.searchType = _this.$route.query.search_type ? false : true;
     },
-    get_city_detail() {
+    // get_city_detail() {
+    //   this.hasResult = this.keyword ? true : false;
+    //   this.$get("/v1/pois", {
+    //     city_id: this.cityId,
+    //     keyword: this.keyword
+    //   }).then(res => {
+    //     this.searchResult = res; //为避免使用文字搜索时获取的信息不全，这里需要优化，应改为使用百度地图的API来查找
+    //   });
+    // },
+    searchPosition_by_keyword(city, keyword) {
       this.hasResult = this.keyword ? true : false;
-      this.$get("/v1/pois", {
-        city_id: this.cityId,
-        keyword: this.keyword
-      }).then(res => {
-        this.searchResult = res;
+      var localSearch = new BMap.LocalSearch(city);
+      localSearch.search(keyword);
+      localSearch.setSearchCompleteCallback(rs => {
+        console.log("baiduSearch", rs);
+        this.searchResult = rs.Br;
       });
     },
     set_history(item, b) {
-      console.log("yyy", b);
       if (b) {
         return false;
       } else {

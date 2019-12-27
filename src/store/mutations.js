@@ -4,7 +4,8 @@ import {
   SET_SELECT_CITY,
   SET_LOGIN_STATE,
   CLEAR_SEARCH_HISTORY,
-  RESET_SURROUNDING_POSITION
+  RESET_SURROUNDING_POSITION,
+  SET_SHIP_ADDRESS
 } from "./const";
 export default {
   [GET_CURRENT_POSITION](state, res) {
@@ -32,5 +33,8 @@ export default {
   },
   [RESET_SURROUNDING_POSITION](state, res) {
     state.surroundingPosition = res.surroundingPois
+  },
+  [SET_SHIP_ADDRESS](state, item) {
+    state.shipAddress = item
   }
 }

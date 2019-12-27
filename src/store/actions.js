@@ -4,7 +4,8 @@ import {
   SET_SELECT_CITY,
   SET_LOGIN_STATE,
   CLEAR_SEARCH_HISTORY,
-  RESET_SURROUNDING_POSITION
+  RESET_SURROUNDING_POSITION,
+  SET_SHIP_ADDRESS
 } from "./const";
 import {
   get
@@ -57,6 +58,9 @@ export default {
   },
   clear_search_history(store) {
     store.commit(CLEAR_SEARCH_HISTORY)
+  },
+  set_ship_address(store, item) {
+    store.commit(SET_SHIP_ADDRESS, item)
   },
   // set_select_city_by_geo(store, item) {
   //   let sel_city_geo = item.geohash

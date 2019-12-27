@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <div class="item-container shipAddress">
+      <div class="item-container shipAddress" v-if="(addressList.length>0)">
         <div class="item-title">
           <span>收货地址</span>
           <router-link to="/my_ship_address">
@@ -50,23 +50,37 @@
           </router-link>
         </div>
         <div class="item-content">
-          <!-- v-for="(item,index) in addressList"
-          :key="index"-->
-          <ul class="address-list" v-show="!hasAdd">
-            <router-link class="list-item" tag="li" :to="{path:'/home',query:{position:1}}">
+          <ul class="address-list">
+            <router-link
+              class="list-item"
+              tag="li"
+              :to="{path:'/home',query:{position:item}}"
+              v-for="(item,index) in addressList"
+              :key="index"
+              @click.native="set_sel_city(item)"
+            >
               <div class="list-item1">
-                <span>后田中心</span>
-                <span class="alert-danger">家</span>
+                <span>{{item.title || item.name}}</span>
+                <span
+                  :class="{'alert-danger': item.user_addressMark == '家','alert-info':item.user_addressMark == '公司','alert-success':item.user_addressMark == '学校'}"
+                >{{item.user_addressMark}}</span>
               </div>
 
-              <div class="list-item2">15-1003</div>
+              <div class="list-item2">{{item.user_detailAdd}}</div>
               <div class="list-item2">
-                <span>五一</span>&nbsp;&nbsp;&nbsp;
-                <span>73993424201</span>
+                <span>{{item.user_name}}{{item.user_gender}}</span>&nbsp;&nbsp;&nbsp;
+                <span>{{item.user_phoneNum}}</span>
               </div>
             </router-link>
           </ul>
         </div>
+      </div>
+      <div class="item-container no-address" v-else>
+        <div class="add-logo">
+          <img src="../../assets/ontheway.gif" alt="rider_logo" width="100%" />
+        </div>
+        <h6>您还没有设置地址</h6>
+        <button class="btn-primary xs-btn" @click="to_add_address">新增地址</button>
       </div>
       <div class="item-container surrounding">
         <div class="item-title">
@@ -92,7 +106,7 @@
         </div>
       </div>
     </main>
-    <footer>
+    <footer v-show="(addressList.length>0)">
       <mt-button type="primary" @click.native="to_add_address">新增地址</mt-button>
     </footer>
   </div>
@@ -107,6 +121,7 @@ export default {
       headerTitle: "",
       city: "",
       cityId: "",
+      addressList: [],
       routeShow: true,
       hasAdd: false,
       hasSurrounding: true
@@ -141,6 +156,7 @@ export default {
         _this.$route.query.currentCity
           ? _this.$route.query.currentCity.id
           : "";
+      _this.addressList = JSON.parse(localStorage.getItem("shipAddress"));
       window.scrollTo(0, 0);
     },
     back_to_home() {
@@ -156,6 +172,11 @@ export default {
       localStorage.setItem("selectPosition", JSON.stringify({}));
       this.$store.dispatch("add_map_position");
     },
+    set_sel_city(item) {
+      console.log("we", item);
+      localStorage.setItem("selectPosition", JSON.stringify(item));
+    },
+
     set_surrounding_position(item) {
       var reset_sel_pos = {};
       reset_sel_pos["address"] = item.address;
@@ -280,11 +301,29 @@ export default {
         padding-bottom: 2px;
       }
     }
+    .no-address {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      .add-logo {
+        width: 70%;
+      }
+      .xs-btn {
+        border: 0;
+        border-radius: 3px;
+        padding: 5px 10px;
+        color: #fff;
+        font-size: 12px;
+        margin-top: 8px;
+      }
+    }
     .surrounding {
       .surrounding-list {
         display: flex;
         flex-wrap: wrap;
         padding: 10px 0;
+        padding-bottom: 0.37rem;
         .surrounding-btn {
           margin: 3px;
           padding: 8px 12px;
@@ -302,6 +341,7 @@ export default {
     position: fixed;
     bottom: 0;
     left: 0;
+    background: #fff;
     .mint-button {
       width: 100%;
       font-size: 14px;
