@@ -81,7 +81,17 @@ export default [{
       component: ModifyShipAddress,
       meta: {
         title: "修改地址",
-        auth: true
+        auth: true,
+        keepAlive: true
+      },
+      beforeEnter: (to, from, next) => {
+        console.log(to, from)
+        if (from.path == "/my_ship_address") {
+          to.meta.keepAlive = false;
+        } else {
+          to.meta.keepAlive = true;
+        }
+        next();
       }
     }, {
       path: '/login',

@@ -123,9 +123,11 @@ export default {
       }
       // console.log("8888", _this.add_address_flag);
       // let oas = JSON.parse(localStorage.searchHistory);
-      _this.headerTitle = this.$route.meta.title;
-      _this.cityId = this.$route.params.currentCityId;
+      _this.headerTitle = _this.$route.meta.title;
+      _this.cityId = _this.$route.params.currentCityId;
+      let info = _this.$route.query.info;
       _this.currentCity =
+        info.city ||
         _this.selectPosition.city ||
         _this.selectPosition.name ||
         _this.currentPosition.currentCity;

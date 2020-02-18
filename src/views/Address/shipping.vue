@@ -77,7 +77,7 @@
       </div>
       <div class="item-container no-address" v-else>
         <div class="add-logo">
-          <img src="../../assets/ontheway.gif" alt="rider_logo" width="100%" />
+          <img src alt="rider_logo" width="100%" />
         </div>
         <h6>您还没有设置地址</h6>
         <button class="btn-primary xs-btn" @click="to_add_address">新增地址</button>

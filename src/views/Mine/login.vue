@@ -132,7 +132,7 @@ export default {
             _this.$cookies.set(
               "password_key",
               data.data.data[0].new_password_key,
-              "30d"
+              "30d" 
             );
             setTimeout(() => {
               _this.$router.push(_this.toRoute);

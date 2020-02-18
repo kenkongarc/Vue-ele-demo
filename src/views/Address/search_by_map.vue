@@ -58,16 +58,21 @@ export default {
       if (!this.addAddressFlag) {
         this.to = "/home";
       }
+      // console.log("init", this.info);
     },
     init_map() {
+      var info = this.$route.query.info;
       var longitude =
-        Object.keys(this.selectPosition).length > 0
+        info.point.lng ||
+        (Object.keys(this.selectPosition).length > 0
           ? this.selectPosition.longitude || this.selectPosition.point["lng"]
-          : this.currentPosition.longitude;
+          : this.currentPosition.longitude);
       var latitude =
-        Object.keys(this.selectPosition).length > 0
+        info.point.lat ||
+        (Object.keys(this.selectPosition).length > 0
           ? this.selectPosition.latitude || this.selectPosition.point.lat
-          : this.currentPosition.latitude;
+          : this.currentPosition.latitude);
+      console.log("initmap", longitude, latitude);
       var map = new BMap.Map("map");
       var point = new BMap.Point(longitude, latitude);
       map.centerAndZoom(point, 16);
